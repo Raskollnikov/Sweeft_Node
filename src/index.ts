@@ -1,20 +1,25 @@
-import express, { Request, Response } from 'express'
+import express from 'express'
 import dotenv from 'dotenv'
-import { PrismaClient } from '@prisma/client'
-const app = express()
+import cors from "cors";
+import companyRoutes from "./routes/company.routes";
+import cookieParser from "cookie-parser";
+import helmet from 'helmet';
 
-const prisma = new PrismaClient()
+const app = express()
 
 dotenv.config()
 
+app.use(cookieParser());
+
 app.use(express.json())
 
+app.use(cors());
+app.use(helmet())
 
-app.get('/',(req:Request,res:Response)=>{
-    res.status(200).json({message:"Initialize App!"})
-})
+app.use("/company", companyRoutes);
 
 const PORT = process.env.PORT;
+
 app.listen(PORT, () => {
     console.log(`Server is running on PORT:${PORT}`)
 })

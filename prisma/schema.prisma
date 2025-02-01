@@ -10,4 +10,21 @@ datasource db {
 }
 
 
+model Company {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  password    String
+  country     String
+  industry    String
+  token       String?  
+  status      Status   @default(PENDING) 
+  isActive    Boolean  @default(false) 
+  createdAt   DateTime @default(now())
+  
+}
 
+enum Status {
+  PENDING
+  ACTIVE
+}
