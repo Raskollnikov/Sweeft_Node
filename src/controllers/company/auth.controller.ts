@@ -132,3 +132,9 @@ export const login = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Error logging in", error });
     }
 };
+
+
+export const logout = (req: Request, res: Response) => {
+    res.clearCookie("jwt", { httpOnly: true });
+    return res.status(200).json({ message: "Logged out successfully" });
+};

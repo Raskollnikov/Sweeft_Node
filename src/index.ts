@@ -13,7 +13,7 @@ app.use(cookieParser());
 
 app.use(express.json())
 
-app.use(cors());
+app.use(cors({credentials:true}));
 app.use(helmet())
 
 app.use("/company", companyRoutes);

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.verify = exports.register = void 0;
+exports.logout = exports.login = exports.verify = exports.register = void 0;
 const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generateToken_1 = require("../../utils/generateToken");
@@ -111,3 +111,8 @@ const login = async (req, res) => {
     }
 };
 exports.login = login;
+const logout = (req, res) => {
+    res.clearCookie("jwt", { httpOnly: true });
+    return res.status(200).json({ message: "Logged out successfully" });
+};
+exports.logout = logout;
