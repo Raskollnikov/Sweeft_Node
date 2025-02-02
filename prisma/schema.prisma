@@ -22,9 +22,33 @@ model Company {
   isActive    Boolean  @default(false) 
   createdAt   DateTime @default(now())
   
+  subscription Subscription?
 }
 
 enum Status {
   PENDING
   ACTIVE
+}
+
+model Subscription {
+  id            String   @id @default(uuid())
+  companyId     String   @unique
+  company       Company  @relation(fields: [companyId], references: [id])
+  plan          Plan
+  maxFiles      Int
+  maxUsers      Int
+  pricePerMonth Float
+  usersCount    Int      @default(0)
+  filesProcessed Int     @default(0)
+  startDate     DateTime @default(now())
+  endDate       DateTime  
+  nextBillingDate DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum Plan {
+  FREE
+  BASIC
+  PREMIUM
 }

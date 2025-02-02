@@ -49,3 +49,14 @@ declare global {<br>
         }<br>
     }<br>
 }<br>
+
+
+
+- subscription system implemented  
+- subscription schema added (prisma/schema.prisma)  
+- subscription table migration created (prisma/migrations/20250202214533_add_subscription_table/)  
+- subscription routes added (src/routes/subscription.routes.ts)  
+- subscription controllers implemented (src/controllers/subscription/)  
+- authentication middleware integrated for subscription routes  
+- subscription logic includes Free, Basic, and Premium plans  
+- user limits and pricing for Basic and Premium plans  

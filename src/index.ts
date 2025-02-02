@@ -2,6 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from "cors";
 import companyRoutes from "./routes/company.routes";
+import subscriptionRoutes from './routes/subscription.routes'
 import cookieParser from "cookie-parser";
 import helmet from 'helmet';
 
@@ -17,6 +18,7 @@ app.use(cors({credentials:true}));
 app.use(helmet())
 
 app.use("/company", companyRoutes);
+app.use("/api/v1/subscriptions", subscriptionRoutes);
 
 const PORT = process.env.PORT;
 
