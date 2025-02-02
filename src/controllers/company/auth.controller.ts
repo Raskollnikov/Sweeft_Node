@@ -56,8 +56,7 @@ export const register = async (req: Request, res: Response) => {
 
 export const verify = async (req: Request, res: Response) => {
     try {
-        const { token } = req.query; 
-
+        const { token } = req.body;
         if (typeof token !== "string") {
             return res.status(400).json({ message: "Invalid token format" });
         }
