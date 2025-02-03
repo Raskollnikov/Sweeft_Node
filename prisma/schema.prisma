@@ -36,7 +36,7 @@ model Subscription {
   company       Company  @relation(fields: [companyId], references: [id])
   plan          Plan
   maxFiles      Int
-  maxUsers      Int
+  maxUsers      Int?
   pricePerMonth Float
   usersCount    Int      @default(0)
   filesProcessed Int     @default(0)

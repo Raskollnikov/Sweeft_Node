@@ -60,3 +60,4 @@ declare global {<br>
 - authentication middleware integrated for subscription routes  
 - subscription logic includes Free, Basic, and Premium plans  
 - user limits and pricing for Basic and Premium plans  
+--downgrade / upgrade controllers created
