@@ -53,6 +53,8 @@ export const register = async (req: Request, res: Response) => {
     }
 };
 
+// during the verification phase of company
+// i will assign the free plan to the company and register the company's Gmail account as ADMIN
 
 export const verify = async (req: Request, res: Response) => {
     try {
@@ -77,7 +79,46 @@ export const verify = async (req: Request, res: Response) => {
             isActive:true 
             },
         });
-    
+
+        const existingAdmin = await prisma.user.findFirst({
+            where: { email: company.email, companyId: company.id },
+        });
+
+            if (!existingAdmin) {
+                const hashedPassword = await bcrypt.hash(company.password, 10);
+        
+                await prisma.user.create({
+                data: {
+                    email: company.email,
+                    password: hashedPassword, 
+                    role: "ADMIN",
+                    companyId: company.id,
+                    isActive: true,
+                },
+                });
+            }
+
+            // free sub
+
+            const existingSubscription = await prisma.subscription.findFirst({
+                where: { companyId: company.id },
+            });
+
+                if (!existingSubscription) {
+                    await prisma.subscription.create({
+                    data: {
+                        plan: "FREE",
+                        companyId: company.id,
+                        startDate: new Date(),
+                        maxFiles: 10,
+                        maxUsers: 1,
+                        pricePerMonth:0,
+                        endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+                        usersCount:1
+                    },
+                    });
+                }
+
         res.status(200).json({ message: "Account successfully verified"});
         } catch (error) {
         res.status(500).json({ message: "Error verifying company", error });

@@ -7,7 +7,7 @@ export const subscribePlan = async (req:Request, res:Response) => {
     const { plan } = req.body;
     const companyId = req.user?.companyId; 
 
-    if (!["FREE", "BASIC", "PREMIUM"].includes(plan)) {
+    if (!["BASIC", "PREMIUM"].includes(plan)) {
         return res.status(400).json({ message: "Invalid plan." });
     }
 
@@ -26,11 +26,6 @@ export const subscribePlan = async (req:Request, res:Response) => {
     let maxFiles=0,maxUsers:number|null=0, pricePerMonth=0;
 
     switch (plan) {
-      case "FREE":
-        maxFiles = 10;
-        maxUsers = 1;
-        pricePerMonth = 0;
-        break;
         case "BASIC":
             maxFiles = 100;
             maxUsers = 10;

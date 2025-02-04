@@ -24,11 +24,26 @@ export const getCompany = async (req: Request, res: Response) => {
             },
         });
 
+        const subscription = await prisma.subscription.findUnique({
+            where:{companyId:req.user.companyId},
+            select:{
+                plan:true,
+                filesProcessed:true,
+                maxFiles:true,
+                maxUsers:true,
+                pricePerMonth:true,
+                usersCount:true,
+                nextBillingDate:true,
+                startDate:true,
+                endDate:true,
+            }
+        })
+
         if (!company) {
             return res.status(404).json({ message: "Company not found" });
         }
 
-        res.status(200).json({ company });
+        res.status(200).json({ company,subscription });
     } catch (error) {
         console.error("Error fetching company:", error);
         res.status(500).json({ message: "An error occurred while fetching company data" });

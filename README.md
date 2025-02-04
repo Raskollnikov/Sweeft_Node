@@ -36,20 +36,7 @@ Helps secure authentication endpoints<br>
 <br>
 TypeScript Type Definitions:<br>
 
--Declared global Request type for Express to include user object:<br>
-<br>
-import { Request } from 'express';<br>
-declare global {<br>
-    namespace Express {<br>
-        interface Request {<br>
-            user?: {<br>
-                companyId: string;<br>
-                email: string;<br>
-            };<br>
-        }<br>
-    }<br>
-}<br>
-
+-Declared global Request type for Express to include user object
 
 
 - subscription system implemented  
@@ -61,3 +48,13 @@ declare global {<br>
 - subscription logic includes Free, Basic, and Premium plans  
 - user limits and pricing for Basic and Premium plans  
 --downgrade / upgrade controllers created
+
+
+- User schema added and updated in Prisma 
+- user table migration created
+- user route added 
+- user controllers implemented (only for admins yet!)
+- Admin role validation middleware added (only admin can add and delete )
+- Email verification for new users implemented
+- user addition and removal integrated with subscription tracking
+- MOST IMPORTANT - during the company verification phase i assign the company Gmail account the ADMIN role and attach the FREE subscription plan

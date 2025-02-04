@@ -23,6 +23,7 @@ model Company {
   createdAt   DateTime @default(now())
   
   subscription Subscription?
+  users       User[]
 }
 
 enum Status {
@@ -51,4 +52,21 @@ enum Plan {
   FREE
   BASIC
   PREMIUM
+}
+
+model User {
+  id         String  @id @default(uuid())
+  email      String  @unique
+  password   String?
+  companyId  String
+  company    Company @relation(fields: [companyId], references: [id])
+  role       Role    @default(EMPLOYEE)  
+  isActive   Boolean @default(false)
+  token      String?  
+  createdAt  DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
 }
