@@ -76,7 +76,7 @@ export const verify = async (req: Request, res: Response) => {
             data: {
             status: "ACTIVE",
             token: null,
-            isActive:true 
+            isActive:true
             },
         });
 
@@ -94,6 +94,7 @@ export const verify = async (req: Request, res: Response) => {
                     role: "ADMIN",
                     companyId: company.id,
                     isActive: true,
+                    username:"admin"
                 },
                 });
             }

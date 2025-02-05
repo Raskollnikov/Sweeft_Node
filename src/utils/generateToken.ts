@@ -20,3 +20,18 @@ export const generateJwt = (companyId: string, email: string, res: Response): vo
         sameSite:true  
     });
 };
+
+export const generateUserJwt = (userId: string, email: string, companyId: string, res: Response): void => {
+    const token = jwt.sign(
+        { userId, email, companyId },
+        process.env.JWT_SECRET!,
+        { expiresIn:'1h' } 
+    );
+
+    res.cookie('userJwt', token, {
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === "production",  
+        maxAge: 60 * 60 * 1000,
+        sameSite: true  
+    });
+};

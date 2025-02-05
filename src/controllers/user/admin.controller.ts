@@ -5,6 +5,22 @@ import { sendVerificationEmail } from "../../utils/email";
 
 const prisma = new PrismaClient();
 
+export const getAllUsers = async (req: Request, res: Response) => {
+    try {
+        const companyId = req.user?.companyId;
+        
+        if (!companyId) return res.status(400).json({ message: "Invalid company ID" });
+
+        const employees = await prisma.user.findMany({
+            where: { companyId, role: "EMPLOYEE" },
+            select: { id: true, email: true, username: true, isActive: true, createdAt: true }
+        });
+
+        res.status(200).json({ employees });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching employees", error });
+    }
+};
 
 export const addUser = async (req: Request, res: Response) => {
     try {
@@ -52,7 +68,6 @@ export const removeUser = async (req: Request, res: Response) => {
         const { employeeId } = req.params;
         const companyId = req.user?.companyId; 
         
-
         if(!companyId) return 
 
         const employee = await prisma.user.findUnique({ where: { id: employeeId } });

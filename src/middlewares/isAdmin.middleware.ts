@@ -14,6 +14,7 @@ export const isAdmin = async (req: Request, res: Response, next: NextFunction) =
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { companyId: string, email: string };
 
+        req.user=decoded
         const user = await prisma.user.findUnique({
         where: {
             email: decoded.email,  

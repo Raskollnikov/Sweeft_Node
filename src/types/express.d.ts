@@ -7,6 +7,7 @@ declare global {
             companyId: string; 
             email: string;
         };
+        isCompany?:boolean
         }
     }
 }

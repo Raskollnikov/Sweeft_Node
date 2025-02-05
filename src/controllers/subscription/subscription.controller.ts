@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// remove later, because company becomes ADMIN on success verification 
 export const subscribePlan = async (req:Request, res:Response) => {
     const { plan } = req.body;
     const companyId = req.user?.companyId; 
