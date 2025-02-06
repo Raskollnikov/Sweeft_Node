@@ -48,8 +48,8 @@ TypeScript Type Definitions:<br>
 - subscription logic includes Free, Basic, and Premium plans  
 - user limits and pricing for Basic and Premium plans  
 --downgrade / upgrade controllers created
-
-
+<br>
+<br>
 - User schema added and updated in Prisma 
 - user table migration created
 - user route added 
@@ -58,3 +58,11 @@ TypeScript Type Definitions:<br>
 - Email verification for new users implemented
 - user addition and removal integrated with subscription tracking
 - MOST IMPORTANT - during the company verification phase i assign the company Gmail account the ADMIN role and attach the FREE subscription plan
+<br>
+<br>
+
+File management implemented:
+-S3(aws) storage integration: implemented file uploading via S3 using multer and multer-S3 + file extension validations
+-File model in database added
+-New route for file created (only for users + userAuthMiddleware correctly implemented)
+-controllers for the file  + router added

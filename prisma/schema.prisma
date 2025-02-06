@@ -24,6 +24,7 @@ model Company {
   
   subscription Subscription?
   users       User[]
+  files      File[]
 }
 
 enum Status {
@@ -65,9 +66,41 @@ model User {
   isActive   Boolean @default(false)
   token      String?  
   createdAt  DateTime @default(now())
+
+  uploadedFiles File[]
+  accessibleFiles File[] @relation("FileAccess")
+
 }
 
 enum Role {
   ADMIN
   EMPLOYEE
+}
+
+
+model File {
+  id          String  @id @default(uuid())
+  name        String
+  url         String 
+  key         String 
+  type        FileType  
+  ownerId     String
+  owner       User    @relation(fields: [ownerId], references: [id])
+  companyId   String
+  company     Company @relation(fields: [companyId], references: [id])
+  createdAt   DateTime @default(now())
+  
+  visibility      Visibility  @default(ALL)
+  allowedUsers    User[]      @relation("FileAccess")
+}
+
+enum FileType {
+  CSV
+  XLS
+  XLSX
+}
+
+enum Visibility {
+  ALL
+  SELECTED
 }

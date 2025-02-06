@@ -6,6 +6,7 @@ declare global {
         user?: { 
             companyId: string; 
             email: string;
+            userId?: string;
         };
         isCompany?:boolean
         }

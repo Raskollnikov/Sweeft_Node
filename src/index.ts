@@ -4,6 +4,7 @@ import cors from "cors";
 import companyRoutes from "./routes/company.routes";
 import subscriptionRoutes from './routes/subscription.routes'
 import userRoutes from './routes/user.routes'
+import fileRoutes from './routes/file.routes'
 import cookieParser from "cookie-parser";
 import helmet from 'helmet';
 
@@ -21,7 +22,7 @@ app.use(helmet())
 app.use("/company", companyRoutes);
 app.use("/api/v1/subscriptions", subscriptionRoutes);
 app.use("/api/v1/user",userRoutes)
-
+app.use('/api/v1/file',fileRoutes)
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
