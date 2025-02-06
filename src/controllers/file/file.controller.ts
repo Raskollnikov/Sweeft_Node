@@ -1,8 +1,15 @@
 import { Request, Response } from "express";
 import { s3, S3_BUCKET } from "../../s3/s3.config";
 import { PrismaClient } from "@prisma/client";
+import { FileType } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
+const MIME_TO_FILETYPE: Record<string, FileType> = {
+  "text/csv": "CSV",
+  "application/vnd.ms-excel": "XLS",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "XLSX",
+};
 
 export const uploadFile = async (req: Request, res: Response) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -21,12 +28,17 @@ export const uploadFile = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid visibility option" });
     }
 
+    const fileType = MIME_TO_FILETYPE[req.file.mimetype];
+    if (!fileType) {
+      return res.status(400).json({ message: "Unsupported file type" });
+    }
+
     const file = await prisma.file.create({
       data: {
         name: req.file.originalname,
         url: (req.file as any).location,
         key: (req.file as any).key,
-        type: req.file.mimetype,
+        type: fileType,
         ownerId: userId,
         companyId,
         visibility,
