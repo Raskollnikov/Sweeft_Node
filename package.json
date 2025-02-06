@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --build",
-    "start": "node ./dist/index.js",
+    "start": "node dist/index.js",
     "dev": "nodemon ./src/index.ts",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:generate": "prisma generate"
   },
   "keywords": [],
   "author": "",

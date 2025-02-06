@@ -7,6 +7,7 @@ import userRoutes from './routes/user.routes'
 import fileRoutes from './routes/file.routes'
 import cookieParser from "cookie-parser";
 import helmet from 'helmet';
+import limiter from './utils/rateLimiter';
 
 const app = express()
 
@@ -15,7 +16,7 @@ dotenv.config()
 app.use(cookieParser());
 
 app.use(express.json())
-
+app.use(limiter)
 app.use(cors({credentials:true}));
 app.use(helmet())
 

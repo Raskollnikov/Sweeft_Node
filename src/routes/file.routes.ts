@@ -32,8 +32,8 @@ const upload = multer({
 
 router.post("/upload",
       userAuthMiddleware,
-      upload.single("file"),
       subscriptionCheckMiddleware,
+      upload.single("file"),
       parseFileMetadata,
       uploadFile);
       

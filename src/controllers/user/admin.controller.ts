@@ -53,7 +53,15 @@ export const addUser = async (req: Request, res: Response) => {
             where: { companyId },
             data: { usersCount: { increment: 1 } }
         });
-
+        
+        if (subscription.plan === 'BASIC') {
+            await prisma.subscription.update({
+                where: { companyId },
+                data: { 
+                    pricePerMonth: (subscription.usersCount + 1) * 5 
+                }
+            });
+        }
         await sendVerificationEmail(email, verificationToken);
         res.status(201).json({ message: "User added. Email sent for activation." });
 
@@ -68,7 +76,19 @@ export const removeUser = async (req: Request, res: Response) => {
         const { id } = req.params;
 
         const companyId = req.user?.companyId;   
+        const subscription = await prisma.subscription.findUnique({ where: { companyId } });
 
+        if(!subscription) return
+
+        if (subscription.plan === 'BASIC') {
+            await prisma.subscription.update({
+                where: { companyId },
+                data: { 
+                    pricePerMonth: (subscription.usersCount - 1) * 5 
+                }
+            });
+        }
+        
         if(!companyId) return 
 
         const employee = await prisma.user.findUnique({ where: { id } });
@@ -76,13 +96,14 @@ export const removeUser = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "user not found" });
         }
 
-        await prisma.user.delete({ where: { id } });
-
         //decrement user count by 1 
         await prisma.subscription.update({
             where: { companyId },
             data: { usersCount: { decrement: 1 } }
         });
+        
+        await prisma.user.delete({ where: { id } });
+
         res.status(200).json({ message: "user deleted successfully" });
 
     } catch (error) {

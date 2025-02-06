@@ -4,11 +4,13 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // remove later, because company becomes ADMIN on success verification 
+// !!! i am keeping this controller because after the plan billing date exceeds user should be able to subscribe again
+
 export const subscribePlan = async (req:Request, res:Response) => {
     const { plan } = req.body;
     const companyId = req.user?.companyId; 
 
-    if (!["BASIC", "PREMIUM"].includes(plan)) {
+    if (!["FREE","BASIC", "PREMIUM"].includes(plan)) {
         return res.status(400).json({ message: "Invalid plan." });
     }
 
@@ -27,6 +29,11 @@ export const subscribePlan = async (req:Request, res:Response) => {
     let maxFiles=0,maxUsers:number|null=0, pricePerMonth=0;
 
     switch (plan) {
+        case "FREE":
+            maxFiles=10;
+            maxUsers=1;
+            pricePerMonth=0;
+            break;
         case "BASIC":
             maxFiles = 100;
             maxUsers = 10;
@@ -105,6 +112,7 @@ export const upgradePlan = async (req: Request, res: Response) => {
             maxFiles,
             maxUsers,
             pricePerMonth,
+            filesProcessed: 0, 
             startDate: new Date(),
             endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
             nextBillingDate: new Date(new Date().setMonth(new Date().getMonth() + 1))
@@ -170,6 +178,7 @@ export const downgradePlan = async (req: Request, res: Response) => {
             maxFiles,
             maxUsers,
             pricePerMonth,
+            filesProcessed: 0,
             startDate: new Date(),
             endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
             nextBillingDate: new Date(new Date().setMonth(new Date().getMonth() + 1))
@@ -177,4 +186,68 @@ export const downgradePlan = async (req: Request, res: Response) => {
     });
 
     res.json({ message: `Successfully downgraded to ${plan} plan.` });
+};
+
+
+export const getCurrentBilling = async (req: Request, res: Response) => {
+    try {
+        const companyId = req.user?.companyId;
+
+        const subscription = await prisma.subscription.findUnique({
+            where: { companyId },
+        });
+
+        if (!subscription) {
+            return res.status(404).json({ message: "Subscription not found" });
+        }
+
+        let billingDetails;
+
+        switch (subscription.plan) {
+            case 'FREE':
+                billingDetails = {
+                    plan: 'FREE',
+                    total: 0
+                };
+                break;
+
+            case 'BASIC':
+                billingDetails = {
+                    plan: 'BASIC',
+                    userCost: 5,
+                    usersCount: subscription.usersCount,
+                    subtotal: subscription.usersCount * 5,
+                    total: subscription.usersCount * 5
+                };
+                break;
+
+            case 'PREMIUM':
+                const filesCount = await prisma.file.count({
+                    where: {
+                        companyId,
+                        createdAt: {
+                            gte: subscription.startDate,
+                            lt: subscription.endDate
+                        }
+                    }
+                });
+
+                const overage = Math.max(filesCount - 1000, 0) * 0.5;
+                
+                billingDetails = {
+                    plan: 'PREMIUM',
+                    basePrice: 300,
+                    filesProcessed: filesCount,
+                    overageFiles: Math.max(filesCount - 1000, 0),
+                    overageCost: overage,
+                    total: 300 + overage
+                };
+                break;
+        }
+
+        res.status(200).json(billingDetails);
+    } catch (error) {
+        console.error("Billing error:", error);
+        res.status(500).json({ message: "Error calculating billing" });
+    }
 };

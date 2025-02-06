@@ -53,26 +53,38 @@ export const getFiles = async (req: Request, res: Response) => {
     const userId = req.user?.userId;
 
     if (!companyId || !userId) {
-        return res.status(400).json({ message: "user or company ID not found" });
-      }
+      return res.status(400).json({ message: "User or company ID not found" });
+    }
 
-
-    const files = await prisma.file.findMany({
-      where: {
-        companyId,
-        OR: [
-          { visibility: "ALL" },
-          { visibility: "SELECTED", allowedUsers: { some: { id: userId } } },
-        ],
-      },
+    const checkIfUserAdmin = await prisma.user.findFirst({
+      where: { id: userId, role: "ADMIN" }
     });
 
-    res.json({ files });
+    let files;
+
+    if (checkIfUserAdmin) {
+      files = await prisma.file.findMany({
+        where: { companyId }
+      });
+    } else {
+      files = await prisma.file.findMany({
+        where: {
+          companyId,
+          OR: [
+            { visibility: "ALL" },
+            { visibility: "SELECTED", allowedUsers: { some: { id: userId } } },
+          ],
+        },
+      });
+    }
+
+    return res.status(200).json({ files });
   } catch (error: any) {
     console.error("Error retrieving files:", error);
     res.status(500).json({ message: "Error retrieving files", error: error.message });
   }
 };
+
 
 
 export const updateFileVisibility = async (req: Request, res: Response) => {

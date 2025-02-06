@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies.jwt;
+    const token = req.cookies.jwt || req.cookies.userJwt;
 
     if (!token) {
         return res.status(401).json({ message: "Unautorized, no token provided" });
