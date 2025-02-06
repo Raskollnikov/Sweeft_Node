@@ -1,3 +1,5 @@
+🚀 **Live Deployment:** [Click Here](https://sweeft-node.onrender.com)
+
 Sweeft Node <br>
 
 added company authentication routes (registration, verify, login), controllers, validations, and utilities
