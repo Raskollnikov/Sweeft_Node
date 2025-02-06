@@ -85,12 +85,10 @@ export const verify = async (req: Request, res: Response) => {
         });
 
             if (!existingAdmin) {
-                const hashedPassword = await bcrypt.hash(company.password, 10);
-        
                 await prisma.user.create({
                 data: {
                     email: company.email,
-                    password: hashedPassword, 
+                    password: company.password, 
                     role: "ADMIN",
                     companyId: company.id,
                     isActive: true,

@@ -65,18 +65,24 @@ export const addUser = async (req: Request, res: Response) => {
 
 export const removeUser = async (req: Request, res: Response) => {
     try {
-        const { employeeId } = req.params;
-        const companyId = req.user?.companyId; 
-        
+        const { id } = req.params;
+
+        const companyId = req.user?.companyId;   
+
         if(!companyId) return 
 
-        const employee = await prisma.user.findUnique({ where: { id: employeeId } });
+        const employee = await prisma.user.findUnique({ where: { id } });
         if (!employee || employee.companyId !== companyId) {
             return res.status(404).json({ message: "user not found" });
         }
 
-        await prisma.user.delete({ where: { id: employeeId } });
+        await prisma.user.delete({ where: { id } });
 
+        //decrement user count by 1 
+        await prisma.subscription.update({
+            where: { companyId },
+            data: { usersCount: { decrement: 1 } }
+        });
         res.status(200).json({ message: "user deleted successfully" });
 
     } catch (error) {

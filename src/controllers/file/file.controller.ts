@@ -5,43 +5,46 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const uploadFile = async (req: Request, res: Response) => {
-    if (!req.file) return res.status(400).json({ message: "no file uploaded" });
+  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-    try {
-      const companyId = req.user?.companyId;
-      const userId = req.user?.userId;
-      const visibility = req.body.visibility || "ALL";
-      const allowedUsers = req.body.allowedUsers || [];
-  
-      if (!companyId || !userId) {
-        return res.status(400).json({ message: "user or company ID not found" });
-      }
+  try {
+    const companyId = req.user?.companyId;
+    const userId = req.user?.userId;
+    const visibility = req.body.visibility || "ALL";
+    const allowedUsers = req.body.allowedUsers || [];
 
-  
-      if (!["ALL", "SELECTED"].includes(visibility)) {
-        return res.status(400).json({ message: "invalid visibility option" });
-      }
-  
-      const file = await prisma.file.create({
-        data: {
-          name: req.file.originalname,
-          url: (req.file as any).location,
-          key: (req.file as any).key,
-          type: req.file.mimetype,
-          ownerId: userId,
-          companyId,
-          visibility,
-          allowedUsers: visibility === "SELECTED" ? { connect: allowedUsers.map((id: string) => ({ id })) } : undefined,
-        },
-      });
-
-
-      res.json({ message: "file uploaded successfully", file });
-    } catch (error: any) {
-      console.error("upload error:", error);
-      res.status(500).json({ message: "Error uploading file", error: error.message });
+    if (!companyId || !userId) {
+      return res.status(400).json({ message: "User or company ID missing" });
     }
-  };
+
+    if (!["ALL", "SELECTED"].includes(visibility)) {
+      return res.status(400).json({ message: "Invalid visibility option" });
+    }
+
+    const file = await prisma.file.create({
+      data: {
+        name: req.file.originalname,
+        url: (req.file as any).location,
+        key: (req.file as any).key,
+        type: req.file.mimetype,
+        ownerId: userId,
+        companyId,
+        visibility,
+        allowedUsers: visibility === "SELECTED" ? { connect: allowedUsers.map((id: string) => ({ id })) } : undefined,
+      },
+    });
+
+    await prisma.subscription.update({
+      where: { companyId },
+      data: { filesProcessed: { increment: 1 } },
+    });
+
+    res.json({ message: "File uploaded successfully", file });
+  } catch (error: any) {
+    console.error("Upload error:", error);
+    res.status(500).json({ message: "Error uploading file", error: error.message });
+  }
+};
 
 
 export const getFiles = async (req: Request, res: Response) => {
@@ -104,7 +107,7 @@ export const deleteFile = async (req: Request, res: Response) => {
   try {
     const { fileId } = req.params;
     const userId = req.user?.userId;
-
+    const companyId=req.user?.companyId
     const file = await prisma.file.findUnique({ where: { id: fileId } });
 
     if (!file || file.ownerId !== userId) {
@@ -119,7 +122,11 @@ export const deleteFile = async (req: Request, res: Response) => {
 
     // dlete from database
     await prisma.file.delete({ where: { id: fileId } });
-
+    
+    await prisma.subscription.update({
+      where: { companyId },
+      data: { filesProcessed: { decrement: 1 } }
+    });
     res.json({ message: "File deleted successfully" });
   } catch (error: any) {
     console.error("Delete file error:", error);

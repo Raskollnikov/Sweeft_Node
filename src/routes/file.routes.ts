@@ -5,7 +5,7 @@ import { s3, S3_BUCKET } from "../s3/s3.config";
 import { uploadFile,getFiles,updateFileVisibility,deleteFile} from "../controllers/file/file.controller";
 import { userAuthMiddleware } from "../middlewares/auth.middleware";
 import { parseFileMetadata } from "../middlewares/parseFIle";
-
+import { subscriptionCheckMiddleware } from "../middlewares/checkSubscription";
 const router = express.Router();
 
 // Initialize Multer with S3 Storage
@@ -30,7 +30,13 @@ const upload = multer({
 });
 
 
-router.post("/upload", userAuthMiddleware, upload.single("file"), parseFileMetadata, uploadFile);
+router.post("/upload",
+      userAuthMiddleware,
+      upload.single("file"),
+      subscriptionCheckMiddleware,
+      parseFileMetadata,
+      uploadFile);
+      
 router.get("/", userAuthMiddleware, getFiles);
 router.patch("/visibility", userAuthMiddleware, updateFileVisibility);
 router.delete("/:fileId", userAuthMiddleware, deleteFile);

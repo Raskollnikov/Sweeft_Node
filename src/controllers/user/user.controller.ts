@@ -29,8 +29,10 @@ export const verifyUser = async (req: Request, res: Response) => {
 export const userLogin = async(req:Request,res:Response)=>{
     const {email,password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
+    
 
-    if (!user || user.role !== "EMPLOYEE") {
+    // now admin can login as regular user
+    if (!user) {
         return res.status(400).json({ message: "invalid credentials" });
     }
 
